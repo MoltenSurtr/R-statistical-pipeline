@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R Statistical Pipeline — Directory Structure</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+          --bg:       #0b0f1a;
+          --surface:  #111827;
+          --border:   #1e2d40;
+          --accent:   #38bdf8;
+          --accent2:  #818cf8;
+          --accent3:  #34d399;
+          --accent4:  #fb923c;
+          --accent5:  #f472b6;
+          --muted:    #4b5563;
+          --text:     #e2e8f0;
+          --text-dim: #94a3b8;
+          --tree-ln:  #1e3a5f;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          background: var(--bg);
+          color: var(--text);
+          font-family: 'JetBrains Mono', monospace;
+          min-height: 100vh;
+          padding: 48px 24px 80px;
+          position: relative;
+          overflow-x: hidden;
+        }
+
+        /* Background grid */
+        body::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+          background-size: 40px 40px;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .container {
+          max-width: 960px;
+          margin: 0 auto;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Header */
+        header {
+          margin-bottom: 56px;
+          animation: fadeDown 0.6s ease both;
+        }
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(56,189,248,0.08);
+          border: 1px solid rgba(56,189,248,0.2);
+          border-radius: 6px;
+          padding: 6px 14px;
+          font-size: 11px;
+          color: var(--accent);
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          margin-bottom: 20px;
+        }
+
+        .badge-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: var(--accent);
+          animation: pulse 2s infinite;
+        }
+
+        h1 {
+          font-family: 'Syne', sans-serif;
+          font-size: clamp(28px, 5vw, 48px);
+          font-weight: 800;
+          line-height: 1.1;
+          background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 12px;
+        }
+
+        .subtitle {
+          color: var(--text-dim);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        /* Legend */
+        .legend {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-bottom: 32px;
+          padding: 16px 20px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          animation: fadeDown 0.6s 0.1s ease both;
+        }
+
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 11px;
+          color: var(--text-dim);
+        }
+
+        .dot {
+          width: 8px; height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        /* Stats bar */
+        .stats {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 12px;
+          margin-bottom: 36px;
+          animation: fadeDown 0.6s 0.15s ease both;
+        }
+
+        .stat-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 16px 18px;
+          transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .stat-card:hover {
+          border-color: var(--accent);
+          transform: translateY(-2px);
+        }
+
+        .stat-num {
+          font-family: 'Syne', sans-serif;
+          font-size: 28px;
+          font-weight: 800;
+          background: linear-gradient(135deg, var(--accent), var(--accent2));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          display: block;
+        }
+
+        .stat-label {
+          font-size: 10px;
+          color: var(--text-dim);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          margin-top: 2px;
+        }
+
+        /* Tree */
+        .tree-wrapper {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          overflow: hidden;
+          animation: fadeUp 0.6s 0.2s ease both;
+        }
+
+        .tree-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 20px;
+          border-bottom: 1px solid var(--border);
+          background: rgba(56,189,248,0.04);
+        }
+
+        .window-dots {
+          display: flex;
+          gap: 6px;
+        }
+
+        .wd { width: 10px; height: 10px; border-radius: 50%; }
+        .wd-r { background: #ff5f57; }
+        .wd-y { background: #ffbd2e; }
+        .wd-g { background: #28c840; }
+
+        .tree-title {
+          font-size: 11px;
+          color: var(--text-dim);
+          letter-spacing: 0.08em;
+        }
+
+        .expand-all {
+          font-size: 10px;
+          color: var(--accent);
+          cursor: pointer;
+          background: none;
+          border: 1px solid rgba(56,189,248,0.25);
+          border-radius: 4px;
+          padding: 3px 10px;
+          font-family: inherit;
+          transition: all 0.2s;
+        }
+
+        .expand-all:hover {
+          background: rgba(56,189,248,0.1);
+        }
+
+        .tree-body {
+          padding: 24px 28px 32px;
+        }
+
+        /* Tree nodes */
+        .node {
+          position: relative;
+        }
+
+        .node-row {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          cursor: default;
+          padding: 3px 0;
+          border-radius: 5px;
+          transition: background 0.15s;
+          position: relative;
+        }
+
+        .node-row:hover {
+          background: rgba(255,255,255,0.03);
+        }
+
+        .node-row.clickable {
+          cursor: pointer;
+        }
+
+        .indent {
+          display: flex;
+          align-items: stretch;
+          flex-shrink: 0;
+        }
+
+        .indent-segment {
+          width: 24px;
+          position: relative;
+          flex-shrink: 0;
+        }
+
+        .indent-segment.has-line::before {
+          content: '';
+          position: absolute;
+          left: 11px;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: var(--tree-ln);
+        }
+
+        .connector {
+          width: 24px;
+          position: relative;
+          flex-shrink: 0;
+          height: 26px;
+        }
+
+        .connector::before {
+          content: '';
+          position: absolute;
+          left: 11px;
+          top: 0;
+          bottom: 13px;
+          width: 1px;
+          background: var(--tree-ln);
+        }
+
+        .connector::after {
+          content: '';
+          position: absolute;
+          left: 11px;
+          top: 13px;
+          width: 10px;
+          height: 1px;
+          background: var(--tree-ln);
+        }
+
+        .connector.last::before {
+          bottom: 13px;
+        }
+
+        .connector.last::after {
+          content: '';
+          position: absolute;
+          left: 11px;
+          top: 0;
+          bottom: 13px;
+          width: 1px;
+          background: var(--tree-ln);
+        }
+
+        .toggle-btn {
+          width: 18px; height: 18px;
+          border-radius: 4px;
+          border: 1px solid var(--border);
+          background: var(--bg);
+          color: var(--accent);
+          font-size: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          margin-right: 6px;
+          transition: all 0.2s;
+          cursor: pointer;
+          font-family: inherit;
+        }
+
+        .toggle-btn:hover {
+          border-color: var(--accent);
+          background: rgba(56,189,248,0.1);
+        }
+
+        .icon {
+          font-size: 14px;
+          margin-right: 8px;
+          flex-shrink: 0;
+        }
+
+        .node-name {
+          font-size: 13px;
+          font-weight: 600;
+          flex: 1;
+        }
+
+        .node-name.dir {
+          color: var(--accent);
+        }
+
+        .node-tag {
+          font-size: 9px;
+          padding: 2px 7px;
+          border-radius: 3px;
+          margin-left: 10px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          flex-shrink: 0;
+        }
+
+        .tag-core    { background: rgba(56,189,248,0.12);  color: var(--accent);  border: 1px solid rgba(56,189,248,0.2); }
+        .tag-output  { background: rgba(52,211,153,0.12);  color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+        .tag-doc     { background: rgba(129,140,248,0.12); color: var(--accent2); border: 1px solid rgba(129,140,248,0.2); }
+        .tag-opt     { background: rgba(251,146,60,0.12);  color: var(--accent4); border: 1px solid rgba(251,146,60,0.2); }
+        .tag-data    { background: rgba(244,114,182,0.12); color: var(--accent5); border: 1px solid rgba(244,114,182,0.2); }
+        .tag-ci      { background: rgba(148,163,184,0.10); color: var(--text-dim); border: 1px solid rgba(148,163,184,0.2); }
+
+        .node-desc {
+          font-size: 11px;
+          color: var(--muted);
+          margin-left: 10px;
+          font-weight: 300;
+        }
+
+        .children {
+          overflow: hidden;
+          transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+        }
+
+        .children.collapsed {
+          max-height: 0 !important;
+          opacity: 0;
+        }
+
+        /* Tooltip */
+        .node-row[data-tip] {
+          position: relative;
+        }
+
+        .node-row[data-tip]:hover::after {
+          content: attr(data-tip);
+          position: absolute;
+          left: 100%;
+          top: 50%;
+          transform: translateY(-50%);
+          margin-left: 12px;
+          background: #1e293b;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 6px 12px;
+          font-size: 11px;
+          color: var(--text-dim);
+          white-space: nowrap;
+          z-index: 100;
+          pointer-events: none;
+        }
+
+        /* Footer note */
+        .footnote {
+          margin-top: 36px;
+          padding: 18px 22px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-left: 3px solid var(--accent);
+          border-radius: 10px;
+          font-size: 12px;
+          color: var(--text-dim);
+          line-height: 1.7;
+          animation: fadeUp 0.6s 0.3s ease both;
+        }
+
+        .footnote strong { color: var(--text); }
+
+        /* Animations */
+        @keyframes fadeDown {
+          from { opacity:0; transform: translateY(-16px); }
+          to   { opacity:1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+          from { opacity:0; transform: translateY(16px); }
+          to   { opacity:1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+          0%,100% { opacity:1; }
+          50% { opacity:0.4; }
+        }
+
+        @media (max-width: 600px) {
+          .node-desc { display: none; }
+          body { padding: 28px 16px 60px; }
+          .tree-body { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <div class="badge"><span class="badge-dot"></span>v1.0.0 · R ≥ 4.2</div>
+        <h1>R Statistical Pipeline</h1>
+        <p class="subtitle">Repository directory structure — click folders to expand / collapse</p>
+    </header>
+
+    <div class="legend">
+        <div class="legend-item"><span class="dot" style="background:#38bdf8"></span> Core script</div>
+        <div class="legend-item"><span class="dot" style="background:#34d399"></span> Generated output</div>
+        <div class="legend-item"><span class="dot" style="background:#818cf8"></span> Documentation</div>
+        <div class="legend-item"><span class="dot" style="background:#fb923c"></span> Optional / example</div>
+        <div class="legend-item"><span class="dot" style="background:#f472b6"></span> Data</div>
+        <div class="legend-item"><span class="dot" style="background:#94a3b8"></span> CI / config</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card"><span class="stat-num">1</span><span class="stat-label">Core Script</span></div>
+        <div class="stat-card"><span class="stat-num">30+</span><span class="stat-label">Auto-installed Packages</span></div>
+        <div class="stat-card"><span class="stat-num">13</span><span class="stat-label">Analysis Modules</span></div>
+        <div class="stat-card"><span class="stat-num">15+</span><span class="stat-label">Plot Types</span></div>
+        <div class="stat-card"><span class="stat-num">6</span><span class="stat-label">Export Formats</span></div>
+    </div>
+
+    <div class="tree-wrapper">
+        <div class="tree-header">
+            <div class="window-dots">
+                <div class="wd wd-r"></div>
+                <div class="wd wd-y"></div>
+                <div class="wd wd-g"></div>
+            </div>
+            <span class="tree-title">r-statistical-pipeline/</span>
+            <button class="expand-all" onclick="toggleAll()">Expand All</button>
+        </div>
+        <div class="tree-body" id="tree"></div>
+    </div>
+
+    <div class="footnote">
+        <strong>📌 Gitignored by default:</strong> <code>pipeline_output/</code>, <code>data/raw/</code>, <code>.Rhistory</code>, <code>.RData</code>, <code>renv/library/</code><br>
+        <strong>🚀 To get started:</strong> Clone the repo → edit <code>CONFIG</code> in <code>statistical_pipeline.R</code> → <code>source("statistical_pipeline.R")</code><br>
+        <strong>📦 Optional modules:</strong> ANCOVA, survival analysis, and repeated-measures require extra CONFIG fields — see documentation.
+    </div>
+
+</div>
+
+<script>
+    const TREE = {
+      name: "r-statistical-pipeline",
+      type: "dir",
+      desc: "Repository root",
+      open: true,
+      children: [
+        {
+          name: "statistical_pipeline.R",
+          type: "file",
+          tag: "core",
+          icon: "📊",
+          desc: "Main pipeline — source this file to run everything",
+          tip: "550+ lines · self-installing · single source() call"
+        },
+        {
+          name: "README.md",
+          type: "file",
+          tag: "doc",
+          icon: "📄",
+          desc: "GitHub readme with quick-start, config reference, output map"
+        },
+        {
+          name: "pipeline_documentation.docx",
+          type: "file",
+          tag: "doc",
+          icon: "📘",
+          desc: "Full Word documentation — all CONFIG options, interpretation guide"
+        },
+        {
+          name: "directory_structure.html",
+          type: "file",
+          tag: "doc",
+          icon: "🗂️",
+          desc: "This interactive file — visual repo map"
+        },
+        {
+          name: "CHANGELOG.md",
+          type: "file",
+          tag: "doc",
+          icon: "📝",
+          desc: "Version history and release notes"
+        },
+        {
+          name: "LICENSE",
+          type: "file",
+          tag: "doc",
+          icon: "⚖️",
+          desc: "MIT License"
+        },
+        {
+          name: ".gitignore",
+          type: "file",
+          tag: "ci",
+          icon: "🔒",
+          desc: "Excludes outputs, raw data, .RData, renv/library"
+        },
+        {
+          name: "R/",
+          type: "dir",
+          icon: "📂",
+          desc: "Modular helper functions (sourced automatically by the pipeline)",
+          open: true,
+          children: [
+            { name: "utils.R",        type:"file", tag:"core", icon:"🔧", desc:"log_msg(), safe_run(), save_plot(), pval_fmt() helpers" },
+            { name: "load_data.R",    type:"file", tag:"core", icon:"📥", desc:"Data loading, cleaning, column-name normalisation" },
+            { name: "descriptives.R", type:"file", tag:"core", icon:"📋", desc:"Per-group stats: mean, SD, SE, CI, skewness, kurtosis, outliers" },
+            { name: "normality.R",    type:"file", tag:"core", icon:"📐", desc:"SW, KS-Lilliefors, Anderson-Darling, Jarque-Bera + QQ plots" },
+            { name: "group_tests.R",  type:"file", tag:"core", icon:"⚖️", desc:"t-test/Welch/MWU/ANOVA/Welch-ANOVA/KW with auto-selection" },
+            { name: "posthoc.R",      type:"file", tag:"core", icon:"🔍", desc:"Tukey, Games-Howell, Dunn, pairwise Wilcoxon" },
+            { name: "effect_sizes.R", type:"file", tag:"core", icon:"📏", desc:"Cohen's d, Hedges' g, Glass's Δ, r, η², ω², ε²" },
+            { name: "power.R",        type:"file", tag:"core", icon:"⚡", desc:"Observed power + n for 80% and 90% power via pwr" },
+            { name: "correlation.R",  type:"file", tag:"core", icon:"🔗", desc:"Pearson + Spearman, corrplots, GGally scatter matrix" },
+            { name: "regression.R",   type:"file", tag:"core", icon:"📈", desc:"Simple + full OLS, tidy coefficients, diagnostic plots" },
+            { name: "ancova.R",       type:"file", tag:"opt",  icon:"🔬", desc:"ANCOVA with emmeans post-hoc (optional)" },
+            { name: "repeated.R",     type:"file", tag:"opt",  icon:"🔄", desc:"LME4 mixed models, ICC, R² marginal/conditional (optional)" },
+            { name: "survival.R",     type:"file", tag:"opt",  icon:"⏱️", desc:"KM curves, log-rank, Cox PH (optional)" },
+            { name: "missing.R",      type:"file", tag:"core", icon:"❓", desc:"naniar missing value summary + visual pattern chart" },
+            { name: "export.R",       type:"file", tag:"core", icon:"💾", desc:"Excel workbook, CSVs, Word report, RDS cache writers" },
+            { name: "plots.R",        type:"file", tag:"core", icon:"🎨", desc:"All ggplot2 visualisations: violin, ridge, heatmap, bars" },
+          ]
+        },
+        {
+          name: "data/",
+          type: "dir",
+          icon: "📂",
+          desc: "Input data (raw gitignored; processed tracked optionally)",
+          open: false,
+          children: [
+            { name: "raw/",            type:"dir",  icon:"📂", tag:"data", desc:"Original unmodified data files (.gitignored)", children:[
+              { name: ".gitkeep",      type:"file", icon:"📄", desc:"Keeps folder in git without committing raw data" }
+            ]},
+            { name: "processed/",      type:"dir",  icon:"📂", tag:"data", desc:"Cleaned / imputed data saved here if needed", children:[
+              { name: ".gitkeep",      type:"file", icon:"📄", desc:"" }
+            ]},
+            { name: "example_data.csv",type:"file", icon:"📊", tag:"data", desc:"90-row, 3-group synthetic demo dataset" },
+          ]
+        },
+        {
+          name: "pipeline_output/",
+          type: "dir",
+          icon: "📂",
+          desc: "Auto-generated by the pipeline (.gitignored)",
+          open: false,
+          children: [
+            { name: "RESULTS.rds",            type:"file", tag:"output", icon:"💾", desc:"Complete R results list — reload with readRDS()" },
+            { name: "statistical_report.docx",type:"file", tag:"output", icon:"📘", desc:"Auto-generated Word summary report" },
+            {
+              name: "plots/", type:"dir", icon:"📂", tag:"output",
+              desc: "All 300dpi PNG visualisations",
+              children: [
+                { name: "dist_{variable}.png",             type:"file", icon:"🎻", tag:"output", desc:"Violin + boxplot + beeswarm per outcome" },
+                { name: "qq_{variable}.png",               type:"file", icon:"📐", tag:"output", desc:"Q-Q normality plots per outcome × group" },
+                { name: "posthoc_{variable}.png",          type:"file", icon:"🔍", tag:"output", desc:"Post-hoc significance brackets" },
+                { name: "ridge_distributions.png",         type:"file", icon:"🏔️", tag:"output", desc:"All outcomes scaled ridge-density plot" },
+                { name: "mean_se_barplot.png",             type:"file", icon:"📊", tag:"output", desc:"Group means ± SE bar chart (faceted)" },
+                { name: "pvalue_heatmap.png",              type:"file", icon:"🌡️", tag:"output", desc:"Raw vs adjusted p-values heatmap" },
+                { name: "correlation_pearson.png",         type:"file", icon:"🔗", tag:"output", desc:"Pearson corrplot (ellipses + numbers)" },
+                { name: "correlation_spearman.png",        type:"file", icon:"🔗", tag:"output", desc:"Spearman corrplot" },
+                { name: "scatter_matrix.png",              type:"file", icon:"⬛", tag:"output", desc:"GGally pairwise scatter with group coloring" },
+                { name: "regression_diagnostics_{var}.png",type:"file", icon:"📈", tag:"output", desc:"Residuals, QQ, scale-location, leverage" },
+                { name: "missing_values.png",              type:"file", icon:"❓", tag:"output", desc:"Missing values per variable bar chart" },
+                { name: "survival_km.png",                 type:"file", icon:"⏱️", tag:"output", desc:"Kaplan-Meier curves (if survival enabled)" },
+              ]
+            },
+            {
+              name: "tables/", type:"dir", icon:"📂", tag:"output",
+              desc: "All results as Excel + individual CSVs",
+              children: [
+                { name: "full_results.xlsx",type:"file", icon:"📗", tag:"output", desc:"Multi-sheet workbook — all tables in one file" },
+                { name: "descriptives.csv", type:"file", icon:"📄", tag:"output", desc:"Per-group descriptive statistics" },
+                { name: "normality.csv",    type:"file", icon:"📄", tag:"output", desc:"All normality test results" },
+                { name: "group_tests.csv",  type:"file", icon:"📄", tag:"output", desc:"Test statistics, raw + adjusted p-values" },
+                { name: "effect_sizes.csv", type:"file", icon:"📄", tag:"output", desc:"All effect size estimates" },
+                { name: "power.csv",        type:"file", icon:"📄", tag:"output", desc:"Power analysis results per outcome" },
+                { name: "outliers.csv",     type:"file", icon:"📄", tag:"output", desc:"Flagged outliers (|z| > threshold)" },
+                { name: "missing.csv",      type:"file", icon:"📄", tag:"output", desc:"Missing value summary per variable" },
+              ]
+            }
+          ]
+        },
+        {
+          name: "tests/",
+          type: "dir",
+          icon: "📂",
+          desc: "Unit tests for helper functions (testthat)",
+          open: false,
+          children: [
+            { name: "testthat/",              type:"dir",  icon:"📂", children:[
+              { name: "test-descriptives.R",  type:"file", icon:"🧪", tag:"ci", desc:"Tests for descriptive stat calculations" },
+              { name: "test-normality.R",     type:"file", icon:"🧪", tag:"ci", desc:"Tests for normality test wrapper functions" },
+              { name: "test-effect-sizes.R",  type:"file", icon:"🧪", tag:"ci", desc:"Tests for effect size calculations" },
+              { name: "test-export.R",        type:"file", icon:"🧪", tag:"ci", desc:"Tests for Excel/CSV export integrity" },
+            ]},
+            { name: "test-pipeline.R",        type:"file", icon:"🧪", tag:"ci", desc:"End-to-end pipeline smoke test on example data" },
+          ]
+        },
+        {
+          name: ".github/",
+          type: "dir",
+          icon: "📂",
+          desc: "GitHub Actions and templates",
+          open: false,
+          children: [
+            { name: "workflows/",                type:"dir", icon:"📂", children:[
+              { name: "R-CMD-check.yml",         type:"file", icon:"⚙️", tag:"ci", desc:"Runs testthat on push / pull request" },
+              { name: "render-readme.yml",       type:"file", icon:"⚙️", tag:"ci", desc:"Auto-renders README if Rmd version exists" },
+            ]},
+            { name: "ISSUE_TEMPLATE/",           type:"dir", icon:"📂", children:[
+              { name: "bug_report.md",           type:"file", icon:"🐛", tag:"ci", desc:"Structured bug report template" },
+              { name: "feature_request.md",      type:"file", icon:"💡", tag:"ci", desc:"Feature request template" },
+            ]},
+            { name: "PULL_REQUEST_TEMPLATE.md",  type:"file", icon:"🔀", tag:"ci", desc:"PR checklist" },
+          ]
+        },
+        {
+          name: "renv/",
+          type: "dir",
+          icon: "📂",
+          desc: "renv lockfile for reproducible package versions (optional)",
+          open: false,
+          children: [
+            { name: "renv.lock", type:"file", icon:"🔐", tag:"ci", desc:"Exact package versions snapshot — use renv::restore()" },
+            { name: "activate.R",type:"file", icon:"⚙️", tag:"ci", desc:"Auto-activates renv when project is opened" },
+          ]
+        },
+      ]
+    };
+
+    const TAG_LABELS = { core:"core", output:"output", doc:"doc", opt:"optional", data:"data", ci:"ci/config" };
+    const TAG_CLASSES = { core:"tag-core", output:"tag-output", doc:"tag-doc", opt:"tag-opt", data:"tag-data", ci:"tag-ci" };
+
+    let allOpen = false;
+    let toggleStates = {};
+    let nodeId = 0;
+
+    function buildTree(node, depth, isLast, parentLines) {
+      const id = `n${nodeId++}`;
+      const isDir = node.type === "dir";
+      const hasChildren = isDir && node.children && node.children.length > 0;
+      const initialOpen = node.open !== undefined ? node.open : true;
+
+      if (isDir && hasChildren) toggleStates[id] = initialOpen;
+
+      const row = document.createElement("div");
+      row.className = "node-row" + (hasChildren ? " clickable" : "");
+      if (node.tip) row.setAttribute("data-tip", node.tip);
+
+      // Indentation
+      const indent = document.createElement("div");
+      indent.className = "indent";
+      parentLines.forEach(hasLine => {
+        const seg = document.createElement("div");
+        seg.className = "indent-segment" + (hasLine ? " has-line" : "");
+        indent.appendChild(seg);
+      });
+      row.appendChild(indent);
+
+      // Connector
+      if (depth > 0) {
+        const conn = document.createElement("div");
+        conn.className = "connector" + (isLast ? " last" : "");
+        row.appendChild(conn);
+      }
+
+      // Toggle button for dirs
+      if (hasChildren) {
+        const btn = document.createElement("button");
+        btn.className = "toggle-btn";
+        btn.id = `btn-${id}`;
+        btn.textContent = initialOpen ? "−" : "+";
+        btn.onclick = (e) => { e.stopPropagation(); toggle(id); };
+        row.appendChild(btn);
+        row.onclick = () => toggle(id);
+      } else {
+        const spacer = document.createElement("div");
+        spacer.style.width = "24px";
+        row.appendChild(spacer);
+      }
+
+      // Icon
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.textContent = node.icon || (isDir ? "📂" : "📄");
+      row.appendChild(icon);
+
+      // Name
+      const name = document.createElement("span");
+      name.className = "node-name" + (isDir ? " dir" : "");
+      name.textContent = node.name;
+      row.appendChild(name);
+
+      // Tag
+      if (node.tag) {
+        const tag = document.createElement("span");
+        tag.className = `node-tag ${TAG_CLASSES[node.tag] || ""}`;
+        tag.textContent = TAG_LABELS[node.tag] || node.tag;
+        row.appendChild(tag);
+      }
+
+      // Description
+      if (node.desc) {
+        const desc = document.createElement("span");
+        desc.className = "node-desc";
+        desc.textContent = "— " + node.desc;
+        row.appendChild(desc);
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "node";
+      wrapper.appendChild(row);
+
+      // Children
+      if (hasChildren) {
+        const childWrap = document.createElement("div");
+        childWrap.className = "children" + (initialOpen ? "" : " collapsed");
+        childWrap.id = `ch-${id}`;
+
+        const childLines = [...parentLines, !isLast];
+        node.children.forEach((child, i) => {
+          const childLast = i === node.children.length - 1;
+          childWrap.appendChild(buildTree(child, depth + 1, childLast, childLines));
+        });
+
+        // Set max-height after render
+        setTimeout(() => {
+          if (initialOpen) childWrap.style.maxHeight = childWrap.scrollHeight + 2000 + "px";
+        }, 0);
+
+        wrapper.appendChild(childWrap);
+      }
+
+      return wrapper;
+    }
+
+    function toggle(id) {
+      const ch = document.getElementById(`ch-${id}`);
+      const btn = document.getElementById(`btn-${id}`);
+      if (!ch) return;
+
+      toggleStates[id] = !toggleStates[id];
+      if (toggleStates[id]) {
+        ch.classList.remove("collapsed");
+        ch.style.maxHeight = ch.scrollHeight + 3000 + "px";
+        if (btn) btn.textContent = "−";
+      } else {
+        ch.style.maxHeight = ch.scrollHeight + "px";
+        requestAnimationFrame(() => {
+          ch.style.maxHeight = "0px";
+          ch.classList.add("collapsed");
+        });
+        if (btn) btn.textContent = "+";
+      }
+    }
+
+    function toggleAll() {
+      allOpen = !allOpen;
+      document.querySelector(".expand-all").textContent = allOpen ? "Collapse All" : "Expand All";
+      Object.keys(toggleStates).forEach(id => {
+        const ch = document.getElementById(`ch-${id}`);
+        const btn = document.getElementById(`btn-${id}`);
+        if (!ch) return;
+        toggleStates[id] = allOpen;
+        if (allOpen) {
+          ch.classList.remove("collapsed");
+          ch.style.maxHeight = ch.scrollHeight + 4000 + "px";
+          if (btn) btn.textContent = "−";
+        } else {
+          ch.style.maxHeight = "0px";
+          ch.classList.add("collapsed");
+          if (btn) btn.textContent = "+";
+        }
+      });
+    }
+
+    // Render
+    const treeEl = document.getElementById("tree");
+    TREE.children.forEach((child, i) => {
+      const isLast = i === TREE.children.length - 1;
+      treeEl.appendChild(buildTree(child, 1, isLast, []));
+    });
+</script>
+</body>
+</html>
